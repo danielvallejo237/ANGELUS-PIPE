@@ -3,6 +3,7 @@
 """
 
 import argparse
+from shutil import ExecError
 import time
 from pathlib import Path
 from tkinter import NE
@@ -15,6 +16,7 @@ from PIL import Image, ImageFilter
 import pytesseract
 import unidecode
 import re
+import os
 
 from models.experimental import attempt_load
 from utils.datasets import LoadStreams, LoadImages
@@ -108,8 +110,10 @@ def NewScaler(coords,width, height,size=(640,640))-> tuple:
     
 
                
-def findNameInFile(source,regions,size=640,save_Img=True,padd=(0,0,0,0)):
+def findNameInFile(source,regions,size=640,save_Img=True,padd=(0,0,0,0),path=None):
     Name=""
+    if len(regions)==0:
+        raise ExecError("ITEMS NOT FOUND")
     if len(regions)>0:
         #print("Nombre encontrado")
         img=Image.open(source)
@@ -123,6 +127,9 @@ def findNameInFile(source,regions,size=640,save_Img=True,padd=(0,0,0,0)):
         #im1=im1.filter(ImageFilter.MinFilter)
         if save_Img:
             nombre_imagen=source.split('/')[-1].split('.')[0]+'_NAME.jpg'
+            if path is not None:
+                assert(type(path)==str)
+                nombre_imagen=os.path.join(path,nombre_imagen)
             im1.save(nombre_imagen)
         
         config=[("--oem 1 --psm 7"),("--oem 1 --psm 13"),("--oem 1 --psm 3"),("--oem 1 --psm 6")]
